@@ -1,0 +1,25 @@
+<!--  наследуемся от шаблона default.html, который мы создавали для flatpages -->
+{% extends 'default.html' %}
+{% load custom_filters %}
+
+<!-- Название у нас будет Product -->
+{% block title %}
+Post
+{% endblock title %}
+
+<!-- В контенте на странице мы выводим сам товар, идентификатор которого был передан в url -->
+{% block content %}
+<h1>{{ post.title }}</h1>
+Дата публикации {{ post.time_creating|date:'d M Y' }}<br>
+{{ post.text|censor }}<br>
+{% if post.category.all %}
+<br>Категории:<br>
+{% for i in post.category.all %}
+{{ i }} {% if not request.user.is_authenticated %}<button>
+    <a href="http://127.0.0.1:8000/accounts/login/"> Подписаться </a></button><br>
+{% elif i not in subscribes %}<button> <a href="{% url 'subscribe' i.pk %}"> Подписаться </a></button><br>
+{% else %} Вы подписаны на эту категорию<br>
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endblock content %}
