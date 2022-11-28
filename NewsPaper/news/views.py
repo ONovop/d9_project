@@ -11,6 +11,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.contrib.auth.models import Group
 from django.core.mail import send_mail, EmailMultiAlternatives
+from django.contrib.auth.models import User
 
 class PostList(ListView):
     model = Post
@@ -67,21 +68,30 @@ class NewsCreate(PermissionRequiredMixin, CreateView):
     template_name = 'posts_edit.html'
 
     def form_valid(self, form):
-        post = form.save(commit=False)
-        post.type = Post.news
+        result = super().form_valid(form)
+        self.object.type = Post.news
 
-        html_content = render_to_string('post_created_mail.html', {'post': post})
+        html_content = render_to_string('post_created_mail.html', {'post': self.object})
 
+        if Post.objects.filter(id=self.object.id).values('category__subscribers').exists():
+            subs = Post.objects.filter(id=self.object.id).values('category__subscribers')
+        else:
+            subs = []
+        emails = []
+        if subs != []:
+            for i in User.objects.all():
+                if i in subs:
+                    emails.append(i.email)
         msg = EmailMultiAlternatives(
-            subject=f'Новый материал{post.title}',
-            body=post.text,
+            subject=f'Новый материал{self.object.title}',
+            body=self.object.text,
             from_email='da3c709e-298c-4bc6-98b5-30bfc7892069@debugmail.io',
-            to=[Category.objects.filter(id=post.category).values('subscribers__email')]
+            to=emails,
         )
         msg.attach_alternative(html_content, "text/html")
         msg.send()
 
-        return super().form_valid(form)
+        return result
 
 class ArticleCreate(PermissionRequiredMixin, CreateView):
     permission_required = ('news.add_post')
