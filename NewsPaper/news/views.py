@@ -79,11 +79,12 @@ class NewsCreate(PermissionRequiredMixin, CreateView):
             subs = []
         emails = []
         if subs != []:
-            for i in User.objects.all():
-                if i in subs:
-                    emails.append(i.email)
+            for sub in subs:
+                for i in User.objects.all():
+                    if i.id == sub['category__subscribers']:
+                        emails.append(i.email)
         msg = EmailMultiAlternatives(
-            subject=f'Новый материал{self.object.title}',
+            subject=f'Новый материал {self.object.title}',
             body=self.object.text,
             from_email='da3c709e-298c-4bc6-98b5-30bfc7892069@debugmail.io',
             to=emails,
@@ -103,9 +104,31 @@ class ArticleCreate(PermissionRequiredMixin, CreateView):
     template_name = 'posts_edit.html'
 
     def form_valid(self, form):
-        post = form.save(commit=False)
-        post.type = Post.article
-        return super().form_valid(form)
+        result = super().form_valid(form)
+        self.object.type = Post.news
+
+        html_content = render_to_string('post_created_mail.html', {'post': self.object})
+
+        if Post.objects.filter(id=self.object.id).values('category__subscribers').exists():
+            subs = Post.objects.filter(id=self.object.id).values('category__subscribers')
+        else:
+            subs = []
+        emails = []
+        if subs != []:
+            for sub in subs:
+                for i in User.objects.all():
+                    if i.id == sub['category__subscribers']:
+                        emails.append(i.email)
+        msg = EmailMultiAlternatives(
+            subject=f'Новый материал {self.object.title}',
+            body=self.object.text,
+            from_email='da3c709e-298c-4bc6-98b5-30bfc7892069@debugmail.io',
+            to=emails,
+        )
+        msg.attach_alternative(html_content, "text/html")
+        msg.send()
+
+        return result
 
 class NewsUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     permission_required = ('news.change_post')

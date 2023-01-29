@@ -6,9 +6,9 @@
     <title>Document</title>
 </head>
 <body>
-    <h2>Добрый день, {{ user.username }}, вышел новый материал в категории, на которую Вы подписаны.</h2>
-    <p> {{ post.title }}<br>
-        {{ post.text|truncatechars:50 }} </p>
+    <h2>Добрый день, вышел новый материал в категории, на которую Вы подписаны.</h2>
+    <p> Название материала: {{ post.title }}<br>
+        Текст: {{ post.text|truncatechars:50 }} </p>
     <a href="{% url 'Detail' post.id %}"> Читать полностью </a>
 </body>
 </html>

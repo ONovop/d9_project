@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.flatpages',
     'django_filters',
+    'django_apscheduler',
 
     'allauth',
     'allauth.account',
@@ -57,9 +58,9 @@ LOGOUT_REDIRECT_URL = '/news'
 
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
-ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
-ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_EMAIL_VERIFICATION = 'optional'
 ACCOUNT_FORMS = {'signup': 'sign.forms.BasicSignupForm'}
 
 SITE_ID = 1
@@ -166,3 +167,11 @@ EMAIL_PORT = 25
 EMAIL_HOST_USER = 'da3c709e-298c-4bc6-98b5-30bfc7892069'
 EMAIL_HOST_PASSWORD = '05f7ac2a-5d8a-4ffa-a230-5e311f10a1d0'
 #EMAIL_USE_SSL = True
+
+DEFAULT_FROM_EMAIL = 'da3c709e-298c-4bc6-98b5-30bfc7892069@debugmail.io'
+
+# формат даты, которую будет воспринимать наш задачник (вспоминаем модуль по фильтрам)
+APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
+
+# если задача не выполняется за 25 секунд, то она автоматически снимается, можете поставить время побольше, но как правило, это сильно бьёт по производительности сервера
+APSCHEDULER_RUN_NOW_TIMEOUT = 25  # Seconds

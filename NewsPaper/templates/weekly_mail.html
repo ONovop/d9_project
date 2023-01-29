@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>Добрый день, за прошедшую неделю вышел новый материал в категории, на которую Вы подписаны.</h2>
+    {% for post in posts %}
+    <p> Название материала: {{ post.title }}<br>
+    <a href="{{ post.get_absolute_url }}"> Читать полностью </a>
+    {% endfor %}
+</body>
+</html>
